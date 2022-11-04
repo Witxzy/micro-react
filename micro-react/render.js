@@ -21,4 +21,25 @@ function render(element, container) {
   container.append(dom);
 }
 
+let nextUnitOfWork = null;
+
+// 调度函数
+function workLoop(deadLine) {
+  // 退出标志位
+  let shouldYield = false;
+
+  // 有工作且浏览器还有剩余时间
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = perfromUnitOfWork(nextUnitOfWork);
+    shouldYield = deadLine.timeRemaining() < 1;
+  }
+
+  // 没有足够时间，请求下次浏览器空闲时执行
+  requestIdleCallback(workLoop);
+}
+
+requestIdleCallback(workLoop);
+
+function perfromUnitOfWork(work) {}
+
 export default render;
